@@ -102,9 +102,10 @@ git clone --recursive https://github.com/nerfstudio-project/gsplat.git
 cd gsplat
 ```
 
-### Install `gsplat` using pip:
+### Install `gsplat` and requirements using pip:
 ```bash
 pip install -e .
+pip install -r examples/requirements.txt
 ```
 
 To build gsplat from source on Windows, please check [this instruction](docs/INSTALL_WIN.md).
