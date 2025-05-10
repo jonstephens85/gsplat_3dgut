@@ -153,8 +153,8 @@ You may run out of memory if you have low VRAM and/or are using too many high re
 1. Install Imagemagick if not already installed
 2. Make a downsample directory and downsample your images. This example is for half scale. For quarter, eighth scale, etc. call your folder images_4, images_8, etc. and change the resize value to 25%, 12.5%, etc.:
 ```
-mkdir -p ./images_2
-mogrify -path ./images_2 -resize 50% ./images/*.jpg
+mkdir images_2
+mogrify -path images_2 -resize 50%% images\*.jpg
 ```
 
 Your resulting folder should look like this:
