@@ -27,9 +27,15 @@ gsplat is an open-source library for CUDA accelerated rasterization of gaussians
 - Install Visual Studio 2022. This must be done before installing CUDA Toolkit. The necessary components are included in the `Desktop Development with C++` workflow (also called `C++ Build Tools` in the BuildTools edition). Also, see below for setup.
 - Cuda Toolkit (I tested with 12.6 and 11.8) Note that if you use 11.8, you will need Visual Studio 2019. You can download VS2019 Professional edition for free. You do not need to activate a license for building gsplat.
 - Pytorch (see below in install notes)
-  v
 
-<br><br>
+<br>
+
+### Creating your environment
+```
+conda create --name gsplat -y python=3.10
+conda activate gsplat
+```
+<br>
 
 ### Visual studio setup
 
@@ -76,24 +82,19 @@ Find your prefered distrbution here: [https://developer.nvidia.com/cuda-toolkit-
 I suggest 12.6, but 11.8 is also compatible with many other 3DGS projects.
 <br><br>
 
-### Create a Conda Environment and Install Pytorch
+### Install Pytorch
 
 For CUDA Toolkit 12.6 
-```bash
-conda create --name gsplat -y python=3.10
-conda activate gsplat
+```
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
 ```
 
 For CUDA Toolkit 11.8
-```bash
-conda create --name gsplat -y python=3.10
-conda activate gsplat
+```
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
 
 **Note:** Refer to [Pytorch.org](https://pytorch.org/get-started/locally/) for additional CUDA Toolkit distributions
-
 <br><br>
 
 ### Clone the `gsplat` repository:
