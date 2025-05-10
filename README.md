@@ -108,7 +108,11 @@ pip install -e .
 pip install -r examples/requirements.txt
 ```
 
-To build gsplat from source on Windows, please check [this instruction](docs/INSTALL_WIN.md).
+### Replace scene_manager.py file
+The `scene_manger.py` file that comes packaged with the project is incompatible with Windows. Replace the file the version in the `assets` folder. [You can download it directly here](https://github.com/jonstephens85/gsplat_3dgut/blob/main/assets/scene_manager.py).
+
+Replace the existing `scene_manager.py` file with the downloaded python script in your: C:\Users\<username>\anaconda3\envs\gsplat\Lib\site-packages\pycolmap **Note: replace the <username> with your username.**
+
 
 ## Evaluation
 
