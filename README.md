@@ -102,40 +102,171 @@ git clone --recursive https://github.com/nerfstudio-project/gsplat.git
 cd gsplat
 ```
 
+<br><br>
+
 ### Install `gsplat` and requirements using pip:
 ```bash
 pip install -e .
 pip install -r examples/requirements.txt
 ```
 
+<br><br>
+
 ### Replace scene_manager.py file
 The `scene_manger.py` file that comes packaged with the project is incompatible with Windows. Replace the file the version in the `assets` folder. [You can download it directly here](https://github.com/jonstephens85/gsplat_3dgut/blob/main/assets/scene_manager.py).
 
 Replace the existing `scene_manager.py` file with the downloaded python script in your: C:\Users\<username>\anaconda3\envs\gsplat\Lib\site-packages\pycolmap **Note: replace the <username> with your username.**
 
+_Congratulations, gsplat is installed and ready to train scenes with 3DGUT!_
 
-## Evaluation
+<br><br>
 
-This repo comes with a standalone script that reproduces the official Gaussian Splatting with exactly the same performance on PSNR, SSIM, LPIPS, and converged number of Gaussians. Powered by gsplat’s efficient CUDA implementation, the training takes up to **4x less GPU memory** with up to **15% less time** to finish than the official implementation. Full report can be found [here](https://docs.gsplat.studio/main/tests/eval.html).
+## 2. Prepare your data
 
-```bash
-cd examples
-pip install -r requirements.txt
-# download mipnerf_360 benchmark data
-python datasets/download_dataset.py
-# run batch evaluation
-bash benchmarks/basic.sh
+This section covers how to prepare your data for training. As more image types are supported, I will expand on this section.
+
+Required software:
+- COLMAP - [Download the latest Windows binary](https://github.com/colmap/colmap/releases) release and install it.
+- Imagemagick (for image downsampling) - [download the installer here](https://imagemagick.org/script/download.php#windows).
+<br><br>
+
+
+The data format is expected to be in the same format as the original 3DGS project, however, cameras, images, and points3d need to be text format:
+```
+<location>
+|---images
+|   |---<image 0>
+|   |---<image 1>
+|   |---...
+|---sparse
+    |---0
+        |---cameras.txt
+        |---images.txt
+        |---points3D.txt
+```
+<br><br>
+
+### Downsampling Images
+You may run out of memory if you have low VRAM and/or are using too many high resolution images. Downsampling will reduce the amount of VRAM needed and speed up training. I suggest keeping images around 2k-4k pixels on the longest dimension.
+
+1. Install Imagemagick if not already installed
+2. Make a downsample directory and downsample your images. This example is for half scale. For quarter, eighth scale, etc. call your folder images_4, images_8, etc. and change the resize value to 25%, 12.5%, etc.:
+```
+mkdir -p ./images_2
+mogrify -path ./images_2 -resize 50% ./images/*.jpg
 ```
 
-## Examples
+Your resulting folder should look like this:
+```
+|---images
+|   |---<image 0>
+|   |---<image 1>
+|---images_2
+|   |---<image 0>
+|   |---<image 1>
+```
+<br><br>
 
-We provide a set of examples to get you started! Below you can find the details about
-the examples (requires to install some exta dependencies via `pip install -r examples/requirements.txt`)
+### Running COLMAP
+COLMAP is a specialized software for running structure from motion. This software will determine where each photo was taken in 3D space as well as build a 3D point cloud for you.
 
-- [Train a 3D Gaussian splatting model on a COLMAP capture.](https://docs.gsplat.studio/main/examples/colmap.html)
-- [Fit a 2D image with 3D Gaussians.](https://docs.gsplat.studio/main/examples/image.html)
-- [Render a large scene in real-time.](https://docs.gsplat.studio/main/examples/large_scale.html)
+If you alread have it installed and are comfortable using it in terminal, follow these commands:
+```
+mkdir sparse
 
+# Use images_2 if you want downsampled images
+# Change to OPENCV_FISHEYE for fisheye lenses
+# Remove --ImageReader.single_camera if using more than one camera
+colmap feature_extractor --database_path database.db --image_path images --ImageReader.camera_model SIMPLE_PINHOLE --ImageReader.single_camera 1
+
+colmap exhaustive_matcher --database_path database.db
+
+# Use images_2 if you want downsampled images
+colmap mapper --database_path database.db --image_path images --output_path sparse
+
+# Convert binary model to text format inside sparse/0
+colmap model_converter --input_path sparse/0 --output_path sparse/0 --output_type TXT
+```
+
+For Newbies, the GUI path is much easier to follow.
+
+Step 1: Install COLMAP - this will install COLMAP from Ubuntu's package manager. If you want the latest updates, consult COLMAP's install page on its website.
+```
+sudo apt update
+sudo apt install colmap
+```
+
+Step 2: Launch the GUI and set up a new project
+- Launch COLMAP using `colmap gui` in terminal. A GUI will launch. From there, select `File > New Project`
+- Select `New` for the Database and create a new database file called `database.db` in your project's root folder (not the images folder)
+- For images, select the `images` folder or `images_2` folder if it exist. Using the downsampled images will run faster and often yields better results!
+
+Step 3: Run Feature Extraction
+- Select `Processing > Feature Extraction`
+- For Camera model select `PINHOLE`, `SIMPLE_PINHOLE`, or `OPENCV_FISHEYE` depending on your camera. I suggest unless you are using a fisheye camera, you should choose `SIMPLE_PINHOLE`
+- Checkmark `Shared for all images` if you used one camera for the entire scene.
+- Click Extract - this should only take a minute or two to run.
+
+Step 4: Feature Matching
+- Select `Processing > Feature Matching`
+- For randomly captured images, use the `Exhaustive` tab, for images taken in sequence, use the `Sequential` tab.
+- Leave parameters at default and click `Run` for large datasets this could take a while...and yes, it runs primarily on CPU.
+
+Step 5: Reconstruction
+- Select `Reconstruction > Start Reconstruction` - this can take a while...and again, it runs on CPU.
+- You will see the scene incrementally build before your eyes. Grab popcorn and enjoy!
+
+Step 6: Export
+- Select `File > Export Model`
+- In the export folder dialog box, create a new folder in your project folder called `sparse`. Within the newly created sparse folder, create another folder called `0`. Save your files into the 0 folder. Refer to my file structure reference above.
+
+BOOM! You are ready to create your very own 3DGUT scene!!!
+
+<br><br>
+
+
+## Training
+
+Simply passing in `--with_ut --with_eval3d` to the `simple_trainer.py` arg list will enable training with 3DGUT! And note in gsplat they only support MCMC densification strategy for 3DGUT.
+
+
+```
+# With fisheye camera
+python examples/simple_trainer.py mcmc --data_dir data/<dataset> --data_factor 2 --result_dir results/<results name> --camera_model fisheye --with_ut --with_eval3d
+
+# With pinhole camera (regular camera)
+python examples/simple_trainer.py mcmc --data_dir data/<dataset> --data_factor 2 --result_dir results/<results name> --camera_model pinhole --with_ut --with_eval3d
+```
+
+**Note on the live viewer:** the path to view it in browser did not work on my PC. Try using [http://localhost:8080/](http://localhost:8080/) to launch the viewer.
+
+<br><br>
+
+
+## Rendering
+
+Once trained, you could view the 3DGS and play with the distortion effect supported through 3DGUT via our viewer:
+
+```bash
+python examples/simple_viewer_3dgut.py --ckpt results/<training result file>.pt 
+```
+
+Or a more comprehensive nerfstudio-style viewer to export videos. (note changing distortion is not yet supported in this comprehensive viewer!)
+```bash
+python examples/simple_viewer.py --with_ut --with_eval3d --ckpt results/<training result file>.pt 
+```
+
+<br><br>
+
+## For users using gsplat' API:
+To use the 3DGUT technique The relavant arguments in `rasterization()` function are:
+- Setting `with_ut=True` and `with_eval3d=True` to enable 3DGUT (which is consist of two parts: using unscented transform to estimate the camera projection and evaluate Gaussian response in 3D space.)
+- To train/render pinhole camera with distortion, setting the distortion parameters to `radial_coeffs`, `tangential_coeffs`, `thin_prism_coeffs`.
+- To train/render fisheye camera with distortion, 
+setting the distortion parameters to `radial_coeffs` and set `camera_model="pinhole"`
+- To enable rolling shutter effects, checks out `rolling_shutter` and `viewmats_rs` on the type of rolling shutters we supported.
+
+<br><br>
 
 ## Development and Contribution
 
