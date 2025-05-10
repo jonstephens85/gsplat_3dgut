@@ -2,7 +2,7 @@
 
 ## About this project fork - READ FIRST
 
-I created this fork from the oiginal gsplat project to guide users through installing gsplat on Windows PCs. Please refer to the original project for the latest developments as this fork does not contain future developments and may not be maintaine in perpetuity.
+I created this fork from the oiginal gsplat project to guide users through installing gsplat on Windows PCs and running 3DGUT. I ommitted basic information on running other gsplat training models. Please refer to the original project for the latest developments as this fork does not contain future developments and will not be maintained long term.
 
 ### Reference to the official gsplat project
 [http://www.gsplat.studio/](http://www.gsplat.studio/)
