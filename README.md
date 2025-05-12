@@ -141,9 +141,9 @@ The data format is expected to be in the same format as the original 3DGS projec
 |   |---...
 |---sparse
     |---0
-        |---cameras.txt
-        |---images.txt
-        |---points3D.txt
+        |---cameras.bin
+        |---images.bin
+        |---points3D.bin
 ```
 <br><br>
 
@@ -154,7 +154,7 @@ You may run out of memory if you have low VRAM and/or are using too many high re
 2. Make a downsample directory and downsample your images. This example is for half scale. For quarter, eighth scale, etc. call your folder images_4, images_8, etc. and change the resize value to 25%, 12.5%, etc.:
 ```
 mkdir images_2
-mogrify -path images_2 -resize 50%% images\*.jpg
+magick mogrify -path images_2 -resize 50%% images\*.jpg
 ```
 
 Your resulting folder should look like this:
@@ -184,9 +184,6 @@ colmap exhaustive_matcher --database_path database.db
 
 # Use images_2 if you want downsampled images
 colmap mapper --database_path database.db --image_path images --output_path sparse
-
-# Convert binary model to text format inside sparse/0
-colmap model_converter --input_path sparse/0 --output_path sparse/0 --output_type TXT
 ```
 
 For Newbies, the GUI path is much easier to follow.
