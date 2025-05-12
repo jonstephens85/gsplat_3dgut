@@ -230,10 +230,10 @@ Simply passing in `--with_ut --with_eval3d` to the `simple_trainer.py` arg list 
 
 ```
 # With fisheye camera
-python examples/simple_trainer.py mcmc --data_dir data/<dataset> --data_factor 2 --result_dir results/<results name> --camera_model fisheye --with_ut --with_eval3d
+python examples/simple_trainer.py mcmc --data_dir data/<dataset> --data_factor 2 --result_dir results/<results name> --camera_model fisheye --save-ply --with_ut --with_eval3d 
 
 # With pinhole camera (regular camera)
-python examples/simple_trainer.py mcmc --data_dir data/<dataset> --data_factor 2 --result_dir results/<results name> --camera_model pinhole --with_ut --with_eval3d
+python examples/simple_trainer.py mcmc --data_dir data/<dataset> --data_factor 2 --result_dir results/<results name> --camera_model pinhole --save-ply --with_ut --with_eval3d 
 ```
 
 **Note on the live viewer:** the path to view it in browser did not work on my PC. Try using [http://localhost:8080/](http://localhost:8080/) to launch the viewer.
