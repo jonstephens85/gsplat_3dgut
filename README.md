@@ -188,33 +188,27 @@ colmap mapper --database_path database.db --image_path images --output_path spar
 
 For Newbies, the GUI path is much easier to follow.
 
-Step 1: Install COLMAP - this will install COLMAP from Ubuntu's package manager. If you want the latest updates, consult COLMAP's install page on its website.
-```
-sudo apt update
-sudo apt install colmap
-```
-
-Step 2: Launch the GUI and set up a new project
+Step 1: Launch the GUI and set up a new project
 - Launch COLMAP using `colmap gui` in terminal. A GUI will launch. From there, select `File > New Project`
 - Select `New` for the Database and create a new database file called `database.db` in your project's root folder (not the images folder)
 - For images, select the `images` folder or `images_2` folder if it exist. Using the downsampled images will run faster and often yields better results!
 
-Step 3: Run Feature Extraction
+Step 2: Run Feature Extraction
 - Select `Processing > Feature Extraction`
 - For Camera model select `PINHOLE`, `SIMPLE_PINHOLE`, or `OPENCV_FISHEYE` depending on your camera. I suggest unless you are using a fisheye camera, you should choose `SIMPLE_PINHOLE`
 - Checkmark `Shared for all images` if you used one camera for the entire scene.
 - Click Extract - this should only take a minute or two to run.
 
-Step 4: Feature Matching
+Step 3: Feature Matching
 - Select `Processing > Feature Matching`
 - For randomly captured images, use the `Exhaustive` tab, for images taken in sequence, use the `Sequential` tab.
 - Leave parameters at default and click `Run` for large datasets this could take a while...and yes, it runs primarily on CPU.
 
-Step 5: Reconstruction
+Step 4: Reconstruction
 - Select `Reconstruction > Start Reconstruction` - this can take a while...and again, it runs on CPU.
 - You will see the scene incrementally build before your eyes. Grab popcorn and enjoy!
 
-Step 6: Export
+Step 5: Export
 - Select `File > Export Model`
 - In the export folder dialog box, create a new folder in your project folder called `sparse`. Within the newly created sparse folder, create another folder called `0`. Save your files into the 0 folder. Refer to my file structure reference above.
 
